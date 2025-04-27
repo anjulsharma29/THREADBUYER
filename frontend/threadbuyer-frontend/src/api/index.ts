@@ -3,7 +3,18 @@ import axios from 'axios';
 const API_URL = 'http://localhost:5000/api';
 
 // Product API calls
-export const getProducts = async () => {
+export interface Product {
+  _id: string;
+  name: string;
+  price: number;
+  category: string;
+  description?: string;
+  sizes?: string[];
+  colors?: string[];
+  image?: string;
+}
+
+export const getProducts = async (): Promise<Product[]> => {
   try {
     const response = await axios.get(`${API_URL}/products`);
     return response.data;
@@ -13,7 +24,7 @@ export const getProducts = async () => {
   }
 };
 
-export const getProductsByCategory = async (category) => {
+export const getProductsByCategory = async (category: string): Promise<Product[]> => {
   try {
     const response = await axios.get(`${API_URL}/products/category/${category}`);
     return response.data;
@@ -23,7 +34,7 @@ export const getProductsByCategory = async (category) => {
   }
 };
 
-export const getProductById = async (id) => {
+export const getProductById = async (id: string): Promise<Product> => {
   try {
     const response = await axios.get(`${API_URL}/products/${id}`);
     return response.data;
@@ -34,7 +45,26 @@ export const getProductById = async (id) => {
 };
 
 // Cart API calls
-export const getCart = async (userId) => {
+export interface CartItem {
+  _id: string;
+  product: {
+    _id: string;
+    name: string;
+    price: number;
+    category: string;
+    image?: string;
+  };
+  quantity: number;
+  size: string;
+  color: string;
+}
+
+export interface Cart {
+  items: CartItem[];
+  userId: string;
+}
+
+export const getCart = async (userId: string): Promise<Cart> => {
   try {
     const response = await axios.get(`${API_URL}/cart/${userId}`);
     return response.data;
@@ -44,7 +74,13 @@ export const getCart = async (userId) => {
   }
 };
 
-export const addToCart = async (userId, productId, quantity, size, color) => {
+export const addToCart = async (
+  userId: string,
+  productId: string,
+  quantity: number,
+  size: string,
+  color: string
+): Promise<Cart> => {
   try {
     const response = await axios.post(`${API_URL}/cart/add`, {
       userId,
@@ -60,7 +96,11 @@ export const addToCart = async (userId, productId, quantity, size, color) => {
   }
 };
 
-export const updateCartItem = async (userId, itemId, quantity) => {
+export const updateCartItem = async (
+  userId: string,
+  itemId: string,
+  quantity: number
+): Promise<Cart> => {
   try {
     const response = await axios.put(`${API_URL}/cart/update`, {
       userId,
@@ -74,7 +114,10 @@ export const updateCartItem = async (userId, itemId, quantity) => {
   }
 };
 
-export const removeFromCart = async (userId, itemId) => {
+export const removeFromCart = async (
+  userId: string,
+  itemId: string
+): Promise<Cart> => {
   try {
     const response = await axios.delete(`${API_URL}/cart/${userId}/${itemId}`);
     return response.data;
@@ -82,4 +125,4 @@ export const removeFromCart = async (userId, itemId) => {
     console.error('Error removing item from cart:', error);
     throw error;
   }
-}; 
+};

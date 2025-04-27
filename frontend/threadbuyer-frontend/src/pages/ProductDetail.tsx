@@ -2,30 +2,33 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useProducts } from '../context/ProductContext';
 import { useCart } from '../context/CartContext';
+import { Product } from '../api';
 
 const ProductDetail = () => {
   const { productId } = useParams();
   const { fetchProductById, loading: productLoading } = useProducts();
   const { addItemToCart, loading: cartLoading } = useCart();
   
-  const [product, setProduct] = useState(null);
-  const [selectedSize, setSelectedSize] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
-  const [quantity, setQuantity] = useState(1);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [quantity, setQuantity] = useState<number>(1);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean>(false);
   
   useEffect(() => {
     const getProduct = async () => {
       if (productId) {
         const data = await fetchProductById(productId);
-        setProduct(data);
-        // Set default selections if product is loaded
-        if (data && data.sizes && data.sizes.length > 0) {
-          setSelectedSize(data.sizes[0]);
-        }
-        if (data && data.colors && data.colors.length > 0) {
-          setSelectedColor(data.colors[0]);
+        if (data) {
+          setProduct(data);
+          // Set default selections if product is loaded
+          if (data.sizes && data.sizes.length > 0) {
+            setSelectedSize(data.sizes[0]);
+          }
+          if (data.colors && data.colors.length > 0) {
+            setSelectedColor(data.colors[0]);
+          }
         }
       }
     };
@@ -36,6 +39,11 @@ const ProductDetail = () => {
   const handleAddToCart = async () => {
     if (!selectedSize || !selectedColor) {
       setError('Please select both size and color');
+      return;
+    }
+    
+    if (!product) {
+      setError('Product not found');
       return;
     }
     
@@ -71,7 +79,22 @@ const ProductDetail = () => {
         <div className="md:flex">
           {/* Product Image */}
           <div className="md:w-1/2">
-            <div className="h-64 md:h-96 bg-gray-200"></div>
+            <div className="h-64 md:h-96 bg-gray-200 relative">
+              {product.image ? (
+                <img 
+                  src={product.image} 
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://via.placeholder.com/400x400?text=Product+Image';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-500">
+                  No image available
+                </div>
+              )}
+            </div>
           </div>
           
           {/* Product Details */}
@@ -88,7 +111,7 @@ const ProductDetail = () => {
             <div className="mb-4">
               <h3 className="text-sm font-medium text-black mb-2">Size</h3>
               <div className="flex flex-wrap gap-2">
-                {product.sizes && product.sizes.map((size) => (
+                {product.sizes?.map((size: string) => (
                   <button
                     key={size}
                     className={`px-3 py-1 border rounded-md ${
@@ -108,7 +131,7 @@ const ProductDetail = () => {
             <div className="mb-6">
               <h3 className="text-sm font-medium text-black mb-2">Color</h3>
               <div className="flex flex-wrap gap-2">
-                {product.colors && product.colors.map((color) => (
+                {product.colors?.map((color: string) => (
                   <button
                     key={color}
                     className={`px-3 py-1 border rounded-md ${
@@ -169,7 +192,7 @@ const ProductDetail = () => {
               onClick={handleAddToCart}
               disabled={cartLoading}
             >
-              {cartLoading ? 'Adding...' : 'Add to Cart'}
+              {cartLoading ? 'Adding to Cart...' : 'Add to Cart'}
             </button>
             
             {/* Continue Shopping Link */}

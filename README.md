@@ -43,7 +43,7 @@ ThreadBuyer is a Myntra-inspired e-commerce clothing website that provides a sea
    npm install
    ```
 
-3. Set up environment variables:
+3. Set up environment variables:(ignore)
    - Create a `.env` file in the backend directory
    - Add the following variables:
      ```
@@ -62,15 +62,17 @@ ThreadBuyer is a Myntra-inspired e-commerce clothing website that provides a sea
    ```
    The server will run on http://localhost:5000
 
+6. If Terminal freezes open a new bash terminal and write cd backend -> npm run dev (MongoDB should connect with that)
+
 ### Frontend Setup
 1. Navigate to the frontend directory:
    ```
-   cd threadbuyer/frontend/threadbuyer-frontend
+   cd frontend/threadbuyer-frontend
    ```
 
 2. Install dependencies:
    ```
-   npm install
+   npm install --legacy-peer-deps
    # or if using pnpm
    pnpm install
    ```

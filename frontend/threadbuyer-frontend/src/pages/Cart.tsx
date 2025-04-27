@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { CartItem } from '../api';
 
 const Cart = () => {
   const { 
@@ -13,7 +14,7 @@ const Cart = () => {
     calculateTotals 
   } = useCart();
   
-  const [localCart, setLocalCart] = useState({ items: [] });
+  const [localCart, setLocalCart] = useState<CartItem[]>([]);
   
   useEffect(() => {
     fetchCart();
@@ -21,16 +22,16 @@ const Cart = () => {
   
   useEffect(() => {
     if (cart) {
-      setLocalCart(cart);
+      setLocalCart(cart.items);
     }
   }, [cart]);
   
-  const handleUpdateQuantity = async (itemId, newQuantity) => {
+  const handleUpdateQuantity = async (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     await updateItemQuantity(itemId, newQuantity);
   };
   
-  const handleRemoveItem = async (itemId) => {
+  const handleRemoveItem = async (itemId: string) => {
     await removeItem(itemId);
   };
   
@@ -65,7 +66,7 @@ const Cart = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-black mb-8">Shopping Cart</h1>
       
-      {localCart.items.length === 0 ? (
+      {localCart.length === 0 ? (
         <div className="bg-white rounded-lg shadow-md p-8 text-center">
           <p className="text-gray-600 mb-4">Your cart is empty</p>
           <Link to="/" className="inline-block bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition-colors">
@@ -77,7 +78,7 @@ const Cart = () => {
           {/* Cart Items */}
           <div className="lg:w-2/3">
             <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-              {localCart.items.map((item) => (
+              {localCart.map((item) => (
                 <div key={item._id} className="border-b border-gray-200 last:border-b-0 p-4 flex flex-col sm:flex-row gap-4">
                   <div className="sm:w-24 h-24 bg-gray-200 rounded-md flex-shrink-0"></div>
                   
